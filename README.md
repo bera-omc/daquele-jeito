@@ -34,9 +34,11 @@ In any Claude Code session:
 - **Invocation phrase (English):** end (or start) your prompt with one of `do it right`, `the right way`, `do it that way`, or `just do it that way`. E.g.:
   > *"I want to build a financial management SaaS. [long project description]. Do it right."*
 
-The skill announces itself on the first activation in the conversation with a line like *"Doing the planning daquele jeito..."* — so you know it triggered. The announcement keeps *daquele jeito* (the skill's identity) regardless of which trigger you used.
+The skill announces itself on the first activation with one line in the conversation's language — EN: *"Doing the planning daquele jeito..."*; PT: *"Fazendo o planejamento daquele jeito..."* — so you know it triggered. The announcement keeps *daquele jeito* (the skill's identity) in both languages, and all workflow output (questions, plan, audits) follows the conversation's language.
 
-> **Heads up on the English triggers:** "do it right", "the right way", "do it that way", and "just do it that way" are common in everyday English speech, so the skill applies stricter disambiguation — it activates only when the phrase appears as a **bare imperative** (final or standalone instruction), not when it's:
+> **Source of truth:** the `description` field in `SKILL.md`'s frontmatter is the single source of the activation rules. This README mirrors it; if they ever disagree, the `description` wins. The labeled regression baseline for these rules lives in [`evals/triggers.md`](evals/triggers.md) (never loaded into context — it exists for testing edits to the `description`).
+
+> **Heads up on the English triggers:** "do it right", "the right way", "do it that way", and "just do it that way" are common in everyday English speech, so the skill applies stricter disambiguation — it activates only when the phrase appears as a **bare imperative** (final, standalone, or phrase-initial instruction), not when it's:
 > - **descriptive** — *"this is the right way to handle errors"*, *"the right way to deploy is X"*
 > - **conditional** — *"if we do it the right way, it takes longer"*
 > - **past tense** — *"you did it right yesterday"*, *"they did it that way last sprint"*
@@ -133,7 +135,7 @@ Or via slash command:
 /that-way I need to plan a simple todo list app
 ```
 
-Expected response: opens with *"Doing the planning daquele jeito..."* followed by a round of structured questions (stack, scope, etc.) before any plan.
+Expected response: opens with *"Doing the planning daquele jeito..."* (or *"Fazendo o planejamento daquele jeito..."* if your conversation is in Portuguese) followed by a round of structured questions (stack, scope, etc.) before any plan.
 
 ## Uninstallation
 
@@ -159,6 +161,6 @@ This is a Claude Code skill that needs to be installed at `~/.claude/skills/<fol
 
 1. **Detect the user's shell first.** If it's **native PowerShell** (Windows), use the commands from the *"Windows (PowerShell)"* section. Otherwise (bash/zsh/Git Bash/WSL/macOS/Linux), use **Option 1 (curl)** — it's a single file, idempotent, simple to execute
 2. After running, suggest the user verify with `/` in autocomplete in a `claude` session in the terminal (doesn't work in Claude.ai web — Claude Code skills are terminal-specific)
-3. Mention that the skill announces itself on the first activation with *"Doing the [type of work] daquele jeito..."* (the announcement keeps the Portuguese keyword regardless of which language triggered it)
+3. Mention that the skill announces itself on the first activation with one line in the conversation's language — *"Doing the [type of work] daquele jeito..."* / *"Fazendo o [tipo de trabalho] daquele jeito..."* (the announcement keeps the Portuguese marker in both languages)
 
 You only need to create the directory and download the raw `SKILL.md` via curl. Don't run destructive commands related to `~/.claude/` (e.g. `rm -rf` on sibling directories of the skill). If the user hasn't explicitly confirmed the install, show the commands and ask for confirmation before executing.
