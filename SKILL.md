@@ -1,18 +1,18 @@
 ---
 name: daquele-jeito
 description: |
-  Use this skill when the user wants a non-trivial task executed with a rigorous workflow: plan-first with a checklist, round of clarifying questions, visible progress, 4-axis audit (functional/regression/hygiene/spec), calibrated effort, and bug-investigation autonomy. Applies to code, infra, content, or design work.
+  Use this skill to execute a non-trivial task (code, infra, content, design) with a rigorous workflow: plan-first checklist, clarifying questions, visible progress, 4-axis audit (functional/regression/hygiene/spec), calibrated effort, bug autonomy.
 
-  TRIGGER when: (1) the user invokes `/daquele-jeito` or `/that-way`; OR (2) the user attaches a trigger phrase as a final/standalone instruction to a concrete task request. Trigger phrases (case-insensitive): Portuguese "faz daquele jeito" / "faça daquele jeito"; English "do it right" / "the right way" / "do it that way". When one of these phrases closes a pragmatic task request ("Build X... do it right.", "Rename Y... the right way."), that IS a bare imperative — trigger.
+  TRIGGER: (1) `/daquele-jeito` or `/that-way`; OR (2) a trigger phrase as a bare imperative on a concrete task request — final, standalone, or phrase-initial ("Build X... do it right."). Phrases (case-insensitive): Portuguese "faz daquele jeito" / "faça daquele jeito"; English "do it right" / "the right way" / "do it that way" / "just do it that way".
 
-  DO NOT TRIGGER when the phrase is negated, conditional, past tense, modal ("I want to do it right"), a meta-question, or qualified as referring to a different method ("faz daquele jeito alternativo").
+  DO NOT TRIGGER when the phrase is negated, conditional, past tense, modal ("I want to do it right"), a meta-question, or refers to a different method ("faz daquele jeito alternativo"). When in doubt, do not trigger — the user can always invoke via slash.
 ---
 
 # Daquele-jeito — workflow for execution projects
 
-Apply this workflow to the user's request and to all subsequent work in this conversation. Applies to structural tasks — code, infra, content, design.
+Apply this workflow to the user's request and to subsequent **structural** work in this conversation (code, infra, content, design). Trivial follow-ups — answerable in one response, no file changes — get a direct answer, no plan; the workflow re-engages on the next structural task. The user can suspend it explicitly.
 
-**Activation announcement:** the **first time** this workflow is activated in a conversation, open the response with a short sentence in the format *"Doing the [type of work] daquele jeito..."* — e.g. *"Doing the SaaS planning daquele jeito..."*, *"Doing the bug fix daquele jeito..."*, *"Doing the comparative analysis daquele jeito..."*. In subsequent activations within the same conversation, **don't repeat** — user already knows it's active.
+**Activation announcement:** on the **first** activation in a conversation, open with one line in the conversation's language, keeping *"daquele jeito"* as the marker — EN: *"Doing the [type of work] daquele jeito..."*; PT: *"Fazendo o [tipo de trabalho] daquele jeito..."*. Don't repeat in later activations. All workflow output (questions, plan, audits) follows the conversation's language.
 
 ## 1. Plan-first
 
@@ -37,7 +37,7 @@ Question format:
 
 ### 1.2 Access manifest — front-load the approvals
 
-Before firing any discovery read (the grep/cat/find/Read of §1.1 and §6), resolve **in one pass** every external resource the task will touch and surface them together — so the human approves a known set once, instead of fielding a trickle of prompts mid-thought. A skill is only prompt: it **cannot** make the harness merge permission pop-ups into a single click. What it *can* do is stop scattering them.
+Before firing any discovery read (the grep/cat/find/Read of §1.1 and §6), resolve **in one pass** every external resource the task will touch and surface them together — so the human approves a known set once, instead of fielding a trickle of prompts mid-thought. A skill can't merge the harness's permission pop-ups, but it can stop scattering them.
 
 1. **Enumerate from the request first.** Parse the user's prompt for every concrete path, repo, URL, domain, and MCP server it already names. Most accesses are explicit in the ask — don't rediscover them one read at a time.
 2. **Declare the manifest.** State them in one short block: *"This touches: `~/dir/a`, repo `x/y`, `domain.com`, MCP `z`."* If discovery will likely surface more, say so — don't pretend the list is final.
@@ -63,7 +63,7 @@ If prior discovery (grep/read in §6) informed the plan, mention it briefly — 
 
 Present the plan, explicitly ask whether the user approves or adjusts it. **Don't execute** without an affirmative signal. If the user just replies "go" or "ok" without reviewing, proceed with the assumptions marked as `[assumed]` in the plan — not silently.
 
-**Why all this:** fixing a plan costs minutes; fixing finished code costs hours. Activating this workflow is the user's way of asking for that protection explicitly — dishonoring the request by executing straight away is the most expensive failure it prevents.
+**Why:** fixing a plan costs minutes; fixing finished work costs hours — activating this workflow is an explicit request for that protection.
 
 ## 2. Visible progress
 
@@ -103,7 +103,6 @@ Short block before marking `[x]` — one line per axis, with concrete evidence:
 > **Step N audit:**
 > - Functional: ✓ `npm test -- auth.test.ts` passed (4/4)
 > - Regression: ✓ `npm test` (87/87), `tsc --noEmit` clean
-> - Hygiene: ✓ diff reviewed, no debug logs or flagged TODOs
 > - Specification: ✓ criterion "`auth()` in server component returns null" verified
 
 If any axis failed or wasn't checked, **don't mark [x]** — deliver the report with the real status and propose the next step (fix, escalate to user, or mark as an explicitly accepted limitation).
@@ -114,7 +113,7 @@ Ask yourself: *"would a senior reviewer approve this?"*. If the answer is "maybe
 
 ## 4. Improvement loop
 
-Before proposing to record a lesson, confirm with the user whether it's a recurring pattern or an isolated case. One-off mistakes become frozen rules that age badly — not worth the noise.
+Before proposing to record a lesson, confirm with the user that it's a recurring pattern — one-off mistakes become frozen rules that age badly.
 
 If recurring, propose **where** to record based on the real scope. Recording at the wrong level is what pollutes memory most over time:
 
@@ -123,14 +122,14 @@ If recurring, propose **where** to record based on the real scope. Recording at 
 - Applies to the project, only the user → `CLAUDE.local.md` (gitignored)
 - Applies across all the user's projects → `~/.claude/CLAUDE.md`
 
-Auto memory (Claude Code v2.1.59+, if enabled) already captures some lessons on its own. Before proposing manual recording, worth checking if it duplicates something auto memory would catch.
+Auto memory (if enabled) already captures some lessons on its own — before proposing manual recording, check for duplication.
 
 ## 5. Calibrate effort to the task
 
 Two failure modes to avoid:
 
-- **Kludge (under-engineering):** Quick fix that resolves the symptom but leaves silent technical debt. Accumulates until the code becomes fragile without anyone noticing.
-- **Over-engineering:** Disproportionate response to the problem. Refactoring three files to fix a typo, or creating an abstraction for something with a single use case.
+- **Kludge (under-engineering):** a quick fix that resolves the symptom but leaves silent technical debt.
+- **Over-engineering:** a disproportionate response — refactoring three files to fix a typo, or abstracting a single use case.
 
 Practical rules:
 
@@ -147,14 +146,16 @@ That autonomy is to *start moving*, not to trickle out access prompts: when you 
 
 ## 7. Subagents
 
-Use the `Task` tool when you need to: (a) scan multiple sources or angles in parallel, (b) isolate heavy context so it doesn't pollute the main thread, or (c) get an independent second pass — e.g. subagent A finds the bug, subagent B validates the fix without having seen the diagnosis.
+Use the subagent tool when you need to: (a) scan multiple sources or angles in parallel, (b) isolate heavy context so it doesn't pollute the main thread, or (c) get an independent second pass — e.g. subagent A finds the bug, subagent B validates the fix without having seen the diagnosis.
 
 Each subagent has its own context; they don't share with you nor with each other. Spawn all from the same round in the same turn (real parallelism) and synthesize only after they all return — don't interpret partially in the middle.
 
-If there are specialized subagents in `.claude/agents/`, prefer them over the generic `Task`: they were designed for the case and tend to have better-calibrated prompts.
+**Fan-out contract:** every research subagent in the batch gets the same short contract: declare your knowledge cutoff; tag each claim [fact]/[inference]/[hypothesis]; write "not confirmed" instead of guessing; cite sources with URL + date; return in the same fixed sections. Uniform returns make synthesis mechanical instead of interpretive.
+
+If there are specialized subagents in `.claude/agents/`, prefer them over the generic one: they were designed for the case and tend to have better-calibrated prompts.
 
 ## 8. Principles
 
 - **Simplicity first:** the smallest change that solves it, with the smallest impact on the rest.
 - **Root cause, not band-aid:** if the symptom disappears but the cause stays, the bug comes back somewhere else.
-- **Surgical:** touch only what's necessary; don't refactor what wasn't asked. If you see something wrong along the way, flag it to the user instead of "fixing it drive-by".
+- **Surgical:** touch only what's necessary; don't refactor what wasn't asked. If you see something wrong along the way, flag it to the user instead of "fixing it drive-by" — or spin it off as a separate task, if the harness offers that.
