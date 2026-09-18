@@ -29,8 +29,8 @@ What typically triggers a question:
 - **Non-obvious constraint** (budget, external dependencies, compatibility)
 
 Question format:
-- **DEFAULT to `AskUserQuestion` (click-question) for ANY decision reducible to ≤4 discrete options.** Use inline text ONLY for genuinely open-ended questions (no enumerable options). Before asking anything inline, run the check: *"could this be ≤4 options?"* — if yes, use `AskUserQuestion`. This default holds for the **ENTIRE session, including late turns — do not let it decay.** (These skill instructions are injected once and attenuate as the conversation grows; hold this one anyway.)
-- Short numbered batch when the options are interdependent (answering together makes sense) — still one `AskUserQuestion` call when each fits ≤4 options.
+- Prefer the runtime's native choice UI for decisions reducible to ≤4 discrete options. If it is unavailable, ask a short inline question; use inline text for genuinely open-ended questions. Before asking, check whether the decision can be reduced to a few meaningful options.
+- Use a short numbered batch when the options are interdependent (answering together makes sense).
 - Each question must materially change the plan — if the answer changes nothing, cut it
 
 **Don't ask** what `grep`, `cat`, `find` or a direct Read solves (see §6). Ask only what the user knows and the repo doesn't answer.
@@ -42,7 +42,7 @@ Before firing any discovery read (the grep/cat/find/Read of §1.1 and §6), reso
 1. **Enumerate from the request first.** Parse the user's prompt for every concrete path, repo, URL, domain, and MCP server it already names. Most accesses are explicit in the ask — don't rediscover them one read at a time.
 2. **Declare the manifest.** State them in one short block: *"This touches: `~/dir/a`, repo `x/y`, `domain.com`, MCP `z`."* If discovery will likely surface more, say so — don't pretend the list is final.
 3. **Batch the discovery.** Fire the opening reads/greps as a single parallel round (one turn, multiple tool calls), not pinged out across the plan. Clustered prompts beat scattered ones even when each still prompts.
-4. **Offer to persist the recurring ones.** When the same folders/domains prompt session after session, the real fix lives in `~/.claude/settings.json` (`permissions.allow`, `additionalDirectories`) or in `/fewer-permission-prompts` — not in the conversation. Offer to add them once so next time they don't prompt at all. Don't edit settings without the human's ok — it's outside the project and changes harness behavior.
+4. **Offer to persist recurring access only when supported by the active runtime.** Do not edit global settings without the human's approval: this is outside the project and changes harness behavior.
 
 Mandatory whenever planning involves reading outside the working directory, fetching URLs, or hitting repos/MCP — i.e. almost always.
 
@@ -117,10 +117,10 @@ Before proposing to record a lesson, confirm with the user that it's a recurring
 
 If recurring, propose **where** to record based on the real scope. Recording at the wrong level is what pollutes memory most over time:
 
-- Applies only to specific files → `.claude/rules/<name>.md` with `paths:` in frontmatter
-- Applies to the whole project, entire team → `.claude/CLAUDE.md` (committed)
-- Applies to the project, only the user → `CLAUDE.local.md` (gitignored)
-- Applies across all the user's projects → `~/.claude/CLAUDE.md`
+- Applies only to specific files → the active runtime's scoped rule mechanism
+- Applies to the whole project, entire team → committed project instructions (`AGENTS.md` for Codex; the project's Claude instruction file for Claude Code)
+- Applies to the project, only the user → a gitignored local instruction file supported by the active runtime
+- Applies across all the user's projects → the active runtime's global instruction file
 
 Auto memory (if enabled) already captures some lessons on its own — before proposing manual recording, check for duplication.
 
@@ -152,7 +152,7 @@ Each subagent has its own context; they don't share with you nor with each other
 
 **Fan-out contract:** every research subagent in the batch gets the same short contract: declare your knowledge cutoff; tag each claim [fact]/[inference]/[hypothesis]; write "not confirmed" instead of guessing; cite sources with URL + date; return in the same fixed sections. Uniform returns make synthesis mechanical instead of interpretive.
 
-If there are specialized subagents in `.claude/agents/`, prefer them over the generic one: they were designed for the case and tend to have better-calibrated prompts.
+If the active runtime exposes specialized subagents for the project, prefer them over a generic one: they were designed for the case and tend to have better-calibrated prompts.
 
 ## 8. Principles
 
